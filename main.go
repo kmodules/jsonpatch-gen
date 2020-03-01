@@ -27,10 +27,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/yaml"
 )
+
+const fmtJSON = "json"
 
 var (
 	pt     string
@@ -48,7 +51,7 @@ func main() {
 
 			var patch string
 			var err error
-			if pt == "json" {
+			if pt == fmtJSON {
 				patch, err = generateJsonPatch(args[0], args[1])
 			} else if pt == "strategic" {
 				patch, err = generateStrategicMergePatch(args[0], args[1])
@@ -63,12 +66,12 @@ func main() {
 			return nil
 		},
 	}
-	rootCmd.Flags().StringVarP(&pt, "type", "t", "json", "The type of patch being provided; one of [json strategic]")
+	rootCmd.Flags().StringVarP(&pt, "type", "t", fmtJSON, "The type of patch being provided; one of [json strategic]")
 	rootCmd.Flags().StringVarP(&output, "output", "o", "yaml", "Output format; one of [json yaml]")
 	rootCmd.Flags().AddGoFlagSet(flag.CommandLine)
-	flag.CommandLine.Parse([]string{})
+	utilruntime.Must(flag.CommandLine.Parse([]string{}))
 
-	rootCmd.Execute()
+	utilruntime.Must(rootCmd.Execute())
 }
 
 func generateJsonPatch(fromFile, toFile string) (string, error) {
@@ -147,10 +150,12 @@ func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
 	overlay["apiVersion"] = u.GetAPIVersion()
 	overlay["kind"] = u.GetKind()
 	err = unstructured.SetNestedField(overlay, u.GetName(), "metadata", "name")
-	err = json.Unmarshal(jp, &overlay)
+	if err != nil {
+		return "", err
+	}
 
 	var patch []byte
-	if output == "json" {
+	if output == fmtJSON {
 		patch, err = json.MarshalIndent(overlay, "", "  ")
 	} else {
 		patch, err = yaml.Marshal(overlay)
