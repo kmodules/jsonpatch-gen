@@ -18,14 +18,14 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"gomodules.xyz/jsonpatch/v2"
 
 	"github.com/pkg/errors"
-	flag "github.com/spf13/pflag"
+	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -38,31 +38,37 @@ var (
 )
 
 func main() {
-	flag.StringVar(&pt, "type", "json", "The type of patch being provided; one of [json strategic]")
-	flag.StringVarP(&output, "output", "o", "yaml", "Output format json|yaml")
-	flag.Parse()
+	var rootCmd = &cobra.Command{
+		Use:   "jsonpatch-gen from.yaml to.yaml",
+		Short: "Generate json patch",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 2 {
+				return fmt.Errorf("usage: jsonpatch-gen from.json to.json")
+			}
 
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: jsonpatch-gen from.json to.json")
-		os.Exit(1)
-	}
+			var patch string
+			var err error
+			if pt == "json" {
+				patch, err = generateJsonPatch(args[0], args[1])
+			} else if pt == "strategic" {
+				patch, err = generateStrategicMergePatch(args[0], args[1])
+			} else {
+				return fmt.Errorf("unknown patch type %s", pt)
+			}
+			if err != nil {
+				return err
+			}
 
-	var patch string
-	var err error
-	if pt == "json" {
-		patch, err = generateJsonPatch(os.Args[1], os.Args[2])
-	} else if pt == "strategic" {
-		patch, err = generateStrategicMergePatch(os.Args[1], os.Args[2])
-	} else {
-		_, _ = fmt.Fprintln(os.Stderr, "unknown patch type", pt)
-		os.Exit(1)
+			fmt.Println(patch)
+			return nil
+		},
 	}
-	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	} else {
-		fmt.Println(patch)
-	}
+	rootCmd.Flags().StringVarP(&pt, "type", "t", "json", "The type of patch being provided; one of [json strategic]")
+	rootCmd.Flags().StringVarP(&output, "output", "o", "yaml", "Output format; one of [json yaml]")
+	rootCmd.Flags().AddGoFlagSet(flag.CommandLine)
+	flag.CommandLine.Parse([]string{})
+
+	rootCmd.Execute()
 }
 
 func generateJsonPatch(fromFile, toFile string) (string, error) {
@@ -128,9 +134,26 @@ func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
 		return "", err
 	}
 
-	patch, err := strategicpatch.CreateTwoWayMergePatch(fromJson, toJson, obj)
+	jp, err := strategicpatch.CreateTwoWayMergePatch(fromJson, toJson, obj)
 	if err != nil {
 		return "", err
+	}
+
+	var overlay map[string]interface{}
+	err = json.Unmarshal(jp, &overlay)
+	if err != nil {
+		return "", err
+	}
+	overlay["apiVersion"] = u.GetAPIVersion()
+	overlay["kind"] = u.GetKind()
+	err = unstructured.SetNestedField(overlay, u.GetName(), "metadata", "name")
+	err = json.Unmarshal(jp, &overlay)
+
+	var patch []byte
+	if output == "json" {
+		patch, err = json.MarshalIndent(overlay, "", "  ")
+	} else {
+		patch, err = yaml.Marshal(overlay)
 	}
 	return string(patch), err
 }
