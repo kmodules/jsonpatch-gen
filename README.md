@@ -8,5 +8,5 @@
 ### Usage
 
 ```console
-jsonpatch-gen src.yaml dst.yaml [-o yaml|json] 
+jsonpatch-gen src.yaml dst.yaml [-type json|strategic] [-o yaml|json]
 ```
