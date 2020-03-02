@@ -1,4 +1,4 @@
-module gomodules.xyz/jsonpatch-gen
+module kmodules.xyz/jsonpatch-gen
 
 go 1.12
 

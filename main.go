@@ -1,5 +1,5 @@
 /*
-Copyright The Gomodules Authors.
+Copyright The Kmodules Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,10 +22,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"gomodules.xyz/jsonpatch/v2"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"gomodules.xyz/jsonpatch/v2"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"

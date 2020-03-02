@@ -15,7 +15,7 @@
 
 SHELL=/bin/bash -o pipefail
 
-GO_PKG   := gomodules.xyz
+GO_PKG   := kmodules.xyz
 REPO     := $(notdir $(shell pwd))
 BIN      := jsonpatch-gen
 COMPRESS ?= no
