@@ -76,7 +76,7 @@ func main() {
 func generateJsonPatch(fromFile, toFile string) (string, error) {
 	fromData, err := ioutil.ReadFile(fromFile)
 	if err != nil {
-		return "", errors.Errorf("failed to read file %s. reason", fromFile, err)
+		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
 	fromJson, err := yaml.YAMLToJSON(fromData)
 	if err != nil {
@@ -85,7 +85,7 @@ func generateJsonPatch(fromFile, toFile string) (string, error) {
 
 	toData, err := ioutil.ReadFile(toFile)
 	if err != nil {
-		return "", errors.Errorf("failed to read file %s. reason", fromFile, err)
+		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
 	toJson, err := yaml.YAMLToJSON(toData)
 	if err != nil {
@@ -109,7 +109,7 @@ func generateJsonPatch(fromFile, toFile string) (string, error) {
 func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
 	fromData, err := ioutil.ReadFile(fromFile)
 	if err != nil {
-		return "", errors.Errorf("failed to read file %s. reason", fromFile, err)
+		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
 	fromJson, err := yaml.YAMLToJSON(fromData)
 	if err != nil {
@@ -118,7 +118,7 @@ func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
 
 	toData, err := ioutil.ReadFile(toFile)
 	if err != nil {
-		return "", errors.Errorf("failed to read file %s. reason", fromFile, err)
+		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
 	toJson, err := yaml.YAMLToJSON(toData)
 	if err != nil {
