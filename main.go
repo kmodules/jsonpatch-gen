@@ -40,7 +40,7 @@ var (
 )
 
 func main() {
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "jsonpatch-gen from.yaml to.yaml",
 		Short: "Generate json patch",
 		RunE: func(cmd *cobra.Command, args []string) error {
