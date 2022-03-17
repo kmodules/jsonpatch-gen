@@ -7,6 +7,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/onsi/gomega v1.13.0 // indirect
 	github.com/pkg/errors v0.9.1
