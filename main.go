@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -74,7 +74,7 @@ func main() {
 }
 
 func generateJsonPatch(fromFile, toFile string) (string, error) {
-	fromData, err := ioutil.ReadFile(fromFile)
+	fromData, err := os.ReadFile(fromFile)
 	if err != nil {
 		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
@@ -83,7 +83,7 @@ func generateJsonPatch(fromFile, toFile string) (string, error) {
 		return "", err
 	}
 
-	toData, err := ioutil.ReadFile(toFile)
+	toData, err := os.ReadFile(toFile)
 	if err != nil {
 		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
@@ -107,7 +107,7 @@ func generateJsonPatch(fromFile, toFile string) (string, error) {
 }
 
 func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
-	fromData, err := ioutil.ReadFile(fromFile)
+	fromData, err := os.ReadFile(fromFile)
 	if err != nil {
 		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
@@ -116,7 +116,7 @@ func generateStrategicMergePatch(fromFile, toFile string) (string, error) {
 		return "", err
 	}
 
-	toData, err := ioutil.ReadFile(toFile)
+	toData, err := os.ReadFile(toFile)
 	if err != nil {
 		return "", errors.Errorf("failed to read file %s. reason: %v", fromFile, err)
 	}
